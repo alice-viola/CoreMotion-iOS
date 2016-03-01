@@ -40,19 +40,23 @@ class AccelerometerTest
         return self.devMotion.getAccelerometerData()
     }
     
+    
     /*
      Gyro
     */
+    func startGyroscopeUpdate() {
+        self.devMotion.startAccelerometerUpdate()
+    }
     
+    func stopGyroscopeUpdate() {
+        self.devMotion.stopAccelerometerUpdate()
+    }
     
+    func getGyroscopeData() -> [Double] {
+        return self.devMotion.getAccelerometerData()
+    }
     
-    /*
-     Mag
-    */
-    
-    
-    
-    
+
     /*
      Device Motion
     */
@@ -69,4 +73,14 @@ class AccelerometerTest
     }
     
     
+    /*
+     Attitude
+    */
+    func getAttitudeRotMatrix() -> [Double] {
+        return self.devMotion.rotMatrix
+    }
+    
+    func getAttitudeQuaternions() -> [Double] {
+        return self.devMotion.quaternions
+    }
 }

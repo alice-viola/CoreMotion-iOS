@@ -11,13 +11,16 @@ import UIKit
 class ViewController: UIViewController
 {
     lazy var deviceMotionTestCase = AccelerometerTest()
+    lazy var writer               = CoreMotionWriter()
     var updateTimer               = NSTimer()
+    private var isRunning         = false
 
     /// Hz
-    let preferredUpdateFrequency: Double = 10.0
+    var preferredUpdateFrequency: Double = 10.0
+    /// Seconds
     var updateTime: NSTimeInterval {
         get {
-            return preferredUpdateFrequency / 60.0
+            return 1.0 / preferredUpdateFrequency
         }
     }
     
@@ -30,10 +33,32 @@ class ViewController: UIViewController
     @IBOutlet var getAccelerationSwitch : UISwitch!
     @IBOutlet var getGryscopeSwitch     : UISwitch!
     @IBOutlet var getDeviceMotionSwitch : UISwitch!
+    @IBOutlet var getAttitudeSwitch     : UISwitch!
+    @IBOutlet var frequencyLabel        : UILabel!
+    @IBOutlet var spinOutlet            : UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupAspect()
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        if getAccelerationSwitch.on {
+            self.deviceMotionTestCase.stopAccelerometerUpdate()
+        }
+        
+        if getGryscopeSwitch.on {
+            self.deviceMotionTestCase.stopGyroscopeUpdate()
+        }
+        
+        if getDeviceMotionSwitch.on {
+            self.deviceMotionTestCase.startDeviceMotionUpdate()
+        }
+    }
+    
+    override func shouldAutorotate() -> Bool {
+        return false
     }
 
     override func didReceiveMemoryWarning() {
@@ -47,20 +72,26 @@ class ViewController: UIViewController
         self.magView.layer.cornerRadius      = 5
         self.devMotView.layer.cornerRadius   = 5
         self.startStopBut.layer.cornerRadius = 5
+        self.spinOutlet.hidden               = true
     }
     
 
     dynamic func updateTimerSelector() {
         if getAccelerationSwitch.on {
-            print(self.deviceMotionTestCase.getAccelerometerData())
+            writer.writeAcceleration(self.deviceMotionTestCase.getAccelerometerData())
         }
         
         if getGryscopeSwitch.on {
-            
+            writer.writeGyroscope(self.deviceMotionTestCase.getGyroscopeData())
         }
         
         if getDeviceMotionSwitch.on {
-            print(self.deviceMotionTestCase.getDeviceMotionData())
+            writer.writeDeviceMotion(self.deviceMotionTestCase.getDeviceMotionData())
+        }
+        
+        if getAttitudeSwitch.on {
+            writer.writeAttitude(self.deviceMotionTestCase.getAttitudeRotMatrix(),
+                quaternions: self.deviceMotionTestCase.getAttitudeQuaternions())
         }
     }
     
@@ -73,17 +104,16 @@ class ViewController: UIViewController
             repeats: true)
         
         if getAccelerationSwitch.on {
-            self.deviceMotionTestCase.stopAccelerometerUpdate()
+            self.deviceMotionTestCase.startAccelerometerUpdate()
         }
         
         if getGryscopeSwitch.on {
-            
+            self.deviceMotionTestCase.startGyroscopeUpdate()
         }
         
-        if getDeviceMotionSwitch.on {
+        if getDeviceMotionSwitch.on || getAttitudeSwitch.on {
             self.deviceMotionTestCase.startDeviceMotionUpdate()
         }
-
     }
     
     func stopSensorsAcquisition() {
@@ -94,10 +124,10 @@ class ViewController: UIViewController
         }
         
         if getGryscopeSwitch.on {
-            
+            self.deviceMotionTestCase.stopGyroscopeUpdate()
         }
         
-        if getDeviceMotionSwitch.on {
+        if getDeviceMotionSwitch.on || getAttitudeSwitch.on {
             self.deviceMotionTestCase.stopDeviceMotionUpdate()
         }
     }
@@ -112,11 +142,31 @@ class ViewController: UIViewController
     */
     
     @IBAction func wantsAcceleration(sender: AnyObject) {
-        
+        if self.isRunning {
+            (sender as! UISwitch).on = !(sender as! UISwitch).on
+            presentAlertForNotAllowedSwitchCommand()
+            return
+        }
+        if (sender as! UISwitch).on {
+            writer.removePreviusAccelerationStream()
+            writer.openAccelerationStream()
+        } else {
+            writer.closeAccelerationStream()
+        }
     }
     
     @IBAction func wantsGryoscope(sender: AnyObject) {
-    
+        if self.isRunning {
+            (sender as! UISwitch).on = !(sender as! UISwitch).on
+            presentAlertForNotAllowedSwitchCommand()
+            return
+        }
+        if (sender as! UISwitch).on {
+            writer.removePreviusGyroscopeStream()
+            writer.openGyroscopeStream()
+        } else {
+            writer.closeGyroscopeStream()
+        }
     }
     
     @IBAction func wantsMagnetometer(sender: AnyObject) {
@@ -129,19 +179,72 @@ class ViewController: UIViewController
     }
     
     @IBAction func wantsDeviceMotion(sender: AnyObject) {
+        if self.isRunning {
+            (sender as! UISwitch).on = !(sender as! UISwitch).on
+            presentAlertForNotAllowedSwitchCommand()
+            return
+        }
+        if (sender as! UISwitch).on {
+            writer.removePreviusDeviceMotionStream()
+            writer.openDeviceMotionStream()
+        } else {
+            writer.closeDeviceMotionStream()
+        }
+    }
     
+    @IBAction func wantsAttitide(sender: AnyObject) {
+        if self.isRunning {
+            (sender as! UISwitch).on = !(sender as! UISwitch).on
+            presentAlertForNotAllowedSwitchCommand()
+            return
+        }
+        if (sender as! UISwitch).on {
+            writer.removePreviusAttitudeStream()
+            writer.openAttitudeStream()
+        } else {
+            writer.closeAttitudeStream()
+        }
     }
     
     @IBAction func startStopAction(sender: AnyObject) {
         if (sender as! UIButton).currentTitle == "Stop" {
             self.stopSensorsAcquisition()
+            self.isRunning = false
+            self.spinOutlet.hidden = true
+            self.spinOutlet.stopAnimating()
             (sender as! UIButton).setTitle("Start", forState: UIControlState.Normal)
         } else {
+            if getAccelerationSwitch.on == false
+                    && getAttitudeSwitch.on == false
+                        && getGryscopeSwitch.on == false
+                            && getDeviceMotionSwitch.on == false {
+                let alert = UIAlertController(title: self.title,
+                message: "You haven't selected any acquisition options",
+                                preferredStyle: UIAlertControllerStyle.Alert)
+                alert.addAction(UIAlertAction(title: "Return", style: UIAlertActionStyle.Cancel, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+                return
+            }
+            
+            self.isRunning = true
             self.startSensorsAcquisition()
+            self.spinOutlet.hidden = false
+            self.spinOutlet.startAnimating()
             (sender as! UIButton).setTitle("Stop", forState: UIControlState.Normal)
         }
     }
     
+    @IBAction func updateFrequencySliderAction(sender: AnyObject) {
+        self.preferredUpdateFrequency = Double((sender as! UISlider).value)
+        frequencyLabel.text = String(Int((sender as! UISlider).value))
+    }
 
+    func presentAlertForNotAllowedSwitchCommand() {
+        let alert = UIAlertController(title: self.title,
+            message: "You need first to stop the data acquisition",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Return", style: UIAlertActionStyle.Cancel, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
 }
 
