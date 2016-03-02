@@ -83,4 +83,8 @@ class AccelerometerTest
     func getAttitudeQuaternions() -> [Double] {
         return self.devMotion.quaternions
     }
+    
+    func getEulerAngles() -> [Double] {
+        return self.devMotion.eulerAngles
+    }
 }

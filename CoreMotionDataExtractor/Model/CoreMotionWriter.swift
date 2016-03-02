@@ -45,6 +45,7 @@ class CoreMotionWriter
         coreMotionStreams.append(CoreMotionStreamType(key: "gyroscope",     file: "gyroscope.csv",      stream: nil))
         coreMotionStreams.append(CoreMotionStreamType(key: "rotMatrix",     file: "rotMatrix.csv",      stream: nil))
         coreMotionStreams.append(CoreMotionStreamType(key: "quaternions",   file: "quaternions.csv",    stream: nil))
+        coreMotionStreams.append(CoreMotionStreamType(key: "eulers",        file: "eulerAngles.csv",    stream: nil))
     }
     
     deinit {
@@ -134,9 +135,12 @@ class CoreMotionWriter
         
         openStream("quaternions")
         writeToStream("quaternions", content: "w, x, y, z \n")
+        
+        openStream("eulers")
+        writeToStream("eulers", content: "x, y, z \n")
     }
     
-    func writeAttitude(rotMatrix: [Double], quaternions: [Double]) {
+    func writeAttitude(rotMatrix: [Double], quaternions: [Double], eulers: [Double]) {
         let rM = String(rotMatrix[0]) + "," +
                     String(rotMatrix[1]) + "," +
                         String(rotMatrix[2]) + "," +
@@ -153,16 +157,23 @@ class CoreMotionWriter
                         String(quaternions[2]) + "," +
                             String(quaternions[3]) + "," + "\n"
         writeToStream("quaternions", content: quat)
+        
+        let eulers = String(eulers[0]) + "," +
+                        String(eulers[1]) + "," +
+                            String(eulers[2]) + "," + "\n"
+        writeToStream("eulers", content: eulers)
     }
     
     func closeAttitudeStream() {
         closeStream("rotMatrix")
         closeStream("quaternions")
+        closeStream("eulers")
     }
     
     func removePreviusAttitudeStream() {
         removeStream("rotMatrix")
         removeStream("quaternions")
+        removeStream("eulers")
     }
     
     /*

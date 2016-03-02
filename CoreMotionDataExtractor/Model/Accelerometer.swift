@@ -92,7 +92,7 @@ class DeviceMotionUtility: DeviceMotionFunctions
                 |___/
 
     */
-    var gryo: [Double] { // [m/s^2]
+    var gryo: [Double] { // [rad/s]
         get {
             var rotRate: [Double] = [0, 0, 0]
             if let x = (motionManager.gyroData?.rotationRate.x) {
@@ -138,7 +138,7 @@ class DeviceMotionUtility: DeviceMotionFunctions
     var devMotAcc: [Double] { // [m/s^2]
         get {
             var usAccMetSecSQ: [Double] = [0, 0, 0]
-            if(self.motionManager.deviceMotion?.timestamp != nil) {
+            if (self.motionManager.deviceMotion?.timestamp != nil) {
                 usAccMetSecSQ[0] = ((motionManager.deviceMotion?.userAcceleration.x)! * gravity)
                 usAccMetSecSQ[1] = ((motionManager.deviceMotion?.userAcceleration.y)! * gravity)
                 usAccMetSecSQ[2] = ((motionManager.deviceMotion?.userAcceleration.z)! * gravity)
@@ -147,10 +147,10 @@ class DeviceMotionUtility: DeviceMotionFunctions
         }
     }
     
-    var rotationRate: [Double] { // [m/s^2]
+    var rotationRate: [Double] { // [rad/s]
         get {
             var usAccMetSecSQ: [Double] = [0, 0, 0]
-            if(self.motionManager.deviceMotion?.timestamp != nil) {
+            if (self.motionManager.deviceMotion?.timestamp != nil) {
                 usAccMetSecSQ[0] = ((motionManager.deviceMotion?.rotationRate.x)! )
                 usAccMetSecSQ[1] = ((motionManager.deviceMotion?.rotationRate.y)! )
                 usAccMetSecSQ[2] = ((motionManager.deviceMotion?.rotationRate.z)! )
@@ -168,7 +168,7 @@ class DeviceMotionUtility: DeviceMotionFunctions
     var rotMatrix: [Double] {
         get {
             var rotMatrix: [Double] = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-            if(self.motionManager.deviceMotion?.timestamp != nil) {
+            if (self.motionManager.deviceMotion?.timestamp != nil) {
                 rotMatrix[0] = ((motionManager.deviceMotion?.attitude.rotationMatrix.m11)!)
                 rotMatrix[1] = ((motionManager.deviceMotion?.attitude.rotationMatrix.m12)!)
                 rotMatrix[2] = ((motionManager.deviceMotion?.attitude.rotationMatrix.m13)!)
@@ -185,16 +185,28 @@ class DeviceMotionUtility: DeviceMotionFunctions
         }
     }
     
-    var quaternions: [Double] {
+    var quaternions: [Double] { // w, x, y, z
         get {
             var quat: [Double] = [0, 0, 0, 0]
-            if(self.motionManager.deviceMotion?.timestamp != nil) {
+            if (self.motionManager.deviceMotion?.timestamp != nil) {
                 quat[0] = ((motionManager.deviceMotion?.attitude.quaternion.w)!)
                 quat[1] = ((motionManager.deviceMotion?.attitude.quaternion.x)!)
                 quat[2] = ((motionManager.deviceMotion?.attitude.quaternion.y)!)
                 quat[3] = ((motionManager.deviceMotion?.attitude.quaternion.z)!)
             }
             return quat
+        }
+    }
+    
+    var eulerAngles: [Double] { // [rad]
+        get {
+            var eulers: [Double] = [0, 0, 0]
+            if (self.motionManager.deviceMotion?.timestamp != nil) {
+                eulers[0] = ((motionManager.deviceMotion?.rotationRate.x)!)
+                eulers[1] = ((motionManager.deviceMotion?.rotationRate.y)!)
+                eulers[2] = ((motionManager.deviceMotion?.rotationRate.z)!)
+            }
+            return eulers
         }
     }
     

@@ -91,7 +91,8 @@ class ViewController: UIViewController
         
         if getAttitudeSwitch.on {
             writer.writeAttitude(self.deviceMotionTestCase.getAttitudeRotMatrix(),
-                quaternions: self.deviceMotionTestCase.getAttitudeQuaternions())
+                quaternions: self.deviceMotionTestCase.getAttitudeQuaternions(),
+                eulers: self.deviceMotionTestCase.getEulerAngles())
         }
     }
     
