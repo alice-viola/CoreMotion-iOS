@@ -26,18 +26,7 @@ class CoreMotionStreamType {
 
 class CoreMotionWriter
 {
-    let accelerationFile = "acceleration.csv"
-    let deviceMotionFile = "deviceMotion.csv"
-    let gyroscopeFile    = "gyroscope.csv"
-    
-    var accelerationStream : NSOutputStream?
-    var deviceMotionStream : NSOutputStream?
-    var gryoscopeStream    : NSOutputStream?
-    
-
-    
     lazy var coreMotionStreams = [CoreMotionStreamType]()
-    
     
     init() {
         coreMotionStreams.append(CoreMotionStreamType(key: "acceleration",  file: "acceleration.csv",   stream: nil))
