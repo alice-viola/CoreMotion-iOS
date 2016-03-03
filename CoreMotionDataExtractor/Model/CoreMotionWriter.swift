@@ -47,7 +47,7 @@ class CoreMotionWriter
     
     func openAccelerationStream() {
         openStream("acceleration")
-        writeToStream("acceleration", content: "accX, accY, accZ, \n")
+        writeToStream("acceleration", content: "rawAccX, rawAccY, rawAccZ, \n")
     }
     
     func writeAcceleration(acceleration: [Double]) {
