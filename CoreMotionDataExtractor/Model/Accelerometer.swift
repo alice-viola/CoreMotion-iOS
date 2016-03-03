@@ -62,8 +62,8 @@ class DeviceMotionUtility: DeviceMotionFunctions
     }
     
     func startAccelerometerUpdate() -> Bool {
-        while !motionManager.accelerometerAvailable {
-            // Wait
+        if !motionManager.accelerometerAvailable {
+            return false
         }
         startAccelerometerUpdatePull()
         return true
@@ -105,8 +105,8 @@ class DeviceMotionUtility: DeviceMotionFunctions
     }
     
     func startGyroscopeUpdate() -> Bool {
-        while !motionManager.gyroAvailable{
-            // Wait
+        if !motionManager.gyroAvailable {
+            return false
         }
         startGyroscopeUpdatePull()
         return true
@@ -202,17 +202,17 @@ class DeviceMotionUtility: DeviceMotionFunctions
         get {
             var eulers: [Double] = [0, 0, 0]
             if (self.motionManager.deviceMotion?.timestamp != nil) {
-                eulers[0] = ((motionManager.deviceMotion?.rotationRate.x)!)
-                eulers[1] = ((motionManager.deviceMotion?.rotationRate.y)!)
-                eulers[2] = ((motionManager.deviceMotion?.rotationRate.z)!)
+                eulers[0] = ((motionManager.deviceMotion?.attitude.roll)!)
+                eulers[1] = ((motionManager.deviceMotion?.attitude.pitch)!)
+                eulers[2] = ((motionManager.deviceMotion?.attitude.yaw)!)
             }
             return eulers
         }
     }
     
     func startSensorsUpdate() -> Bool {
-        while !motionManager.deviceMotionAvailable {
-            // Wait
+        if !motionManager.deviceMotionAvailable {
+            return false
         }
         startDeviceMotionUpdatePull()
         return true

@@ -293,6 +293,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = AmedeoSetti.CoreMotionDataExtractor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -307,6 +308,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = AmedeoSetti.CoreMotionDataExtractor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

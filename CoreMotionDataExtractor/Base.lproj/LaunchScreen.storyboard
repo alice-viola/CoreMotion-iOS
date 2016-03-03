@@ -33,18 +33,13 @@
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="7lM-2S-7ot">
-                                <rect key="frame" x="331" y="281" width="37" height="37"/>
-                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" red="0.098039217289999994" green="0.098039217289999994" blue="0.098039217289999994" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="WOg-Zk-q0a" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="87g-2z-9sq"/>
                             <constraint firstItem="Z2H-rx-Kx6" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="QMn-8Z-ojF"/>
                             <constraint firstItem="Z2H-rx-Kx6" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="XBx-2u-zVt"/>
-                            <constraint firstItem="7lM-2S-7ot" firstAttribute="centerY" secondItem="Z2H-rx-Kx6" secondAttribute="centerY" id="iQo-Lz-9Qx"/>
                             <constraint firstItem="WOg-Zk-q0a" firstAttribute="top" secondItem="Llm-lL-Icb" secondAttribute="bottom" constant="8" id="l5v-d0-f6e"/>
-                            <constraint firstItem="7lM-2S-7ot" firstAttribute="leading" secondItem="Z2H-rx-Kx6" secondAttribute="trailing" constant="8" id="y8m-Wq-5yj"/>
                         </constraints>
                     </view>
                 </viewController>

@@ -28,8 +28,8 @@ class AccelerometerTest
      Acceleration
     */
     
-    func startAccelerometerUpdate() {
-        self.devMotion.startAccelerometerUpdate()
+    func startAccelerometerUpdate() -> Bool {
+        return self.devMotion.startAccelerometerUpdate()
     }
     
     func stopAccelerometerUpdate() {
@@ -44,24 +44,24 @@ class AccelerometerTest
     /*
      Gyro
     */
-    func startGyroscopeUpdate() {
-        self.devMotion.startAccelerometerUpdate()
+    func startGyroscopeUpdate() -> Bool {
+        return self.devMotion.startGyroscopeUpdate()
     }
     
     func stopGyroscopeUpdate() {
-        self.devMotion.stopAccelerometerUpdate()
+        self.devMotion.stopGyroscopeUpdate()
     }
     
     func getGyroscopeData() -> [Double] {
-        return self.devMotion.getAccelerometerData()
+        return self.devMotion.getGyroscopeData()
     }
     
 
     /*
      Device Motion
     */
-    func startDeviceMotionUpdate() {
-        self.devMotion.startSensorsUpdate()
+    func startDeviceMotionUpdate() -> Bool {
+        return self.devMotion.startSensorsUpdate()
     }
     
     func stopDeviceMotionUpdate() {

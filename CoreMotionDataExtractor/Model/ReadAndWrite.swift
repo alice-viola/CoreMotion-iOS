@@ -17,7 +17,7 @@ class ReadAndWriteFile
         do {
             try content.writeToFile(fileName, atomically: false, encoding: NSUTF8StringEncoding)
         } catch {
-            print("\(self) error in write to file")
+            print("\(self): error in write to file")
         }
     }
     
@@ -31,7 +31,7 @@ class ReadAndWriteFile
             outputStream.write(content + "\n")
             outputStream.close()
         } else {
-            print("Unable to open file")
+            print("\(self): unable to open file")
         }
     }
     

@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if (arch(i386) || arch(x86_64)) && os(iOS)
+let SIMULATOR = true
+#else
+let SIMULATOR = false
+#endif
+
 class ViewController: UIViewController
 {
     lazy var deviceMotionTestCase = AccelerometerTest()
@@ -35,7 +41,11 @@ class ViewController: UIViewController
     @IBOutlet var getDeviceMotionSwitch : UISwitch!
     @IBOutlet var getAttitudeSwitch     : UISwitch!
     @IBOutlet var frequencyLabel        : UILabel!
+    
+    
+    @IBOutlet var acquiringDataView     : UIView!
     @IBOutlet var spinOutlet            : UIActivityIndicatorView!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,7 +82,23 @@ class ViewController: UIViewController
         self.magView.layer.cornerRadius      = 5
         self.devMotView.layer.cornerRadius   = 5
         self.startStopBut.layer.cornerRadius = 5
-        self.spinOutlet.hidden               = true
+        self.acquiringDataView.hidden        = true
+    }
+    
+    func hideAcqView() {
+        UIView.animateWithDuration(0.5, animations: {
+            self.acquiringDataView.alpha = 0.0
+            }, completion: nil)
+        self.acquiringDataView.hidden = true
+        self.spinOutlet.stopAnimating()
+    }
+    
+    func showAcqView(redraw: Bool = false) {
+        self.spinOutlet.startAnimating()
+        self.acquiringDataView.hidden = false
+        UIView.animateWithDuration(0.5, animations: {
+            self.acquiringDataView.alpha = 1.0
+            }, completion: nil)
     }
     
 
@@ -96,7 +122,7 @@ class ViewController: UIViewController
         }
     }
     
-    func startSensorsAcquisition() {
+    func startSensorsAcquisition() -> Bool {
         self.updateTimer = NSTimer.scheduledTimerWithTimeInterval(
             updateTime,
             target: self,
@@ -105,16 +131,23 @@ class ViewController: UIViewController
             repeats: true)
         
         if getAccelerationSwitch.on {
-            self.deviceMotionTestCase.startAccelerometerUpdate()
+            if !self.deviceMotionTestCase.startAccelerometerUpdate() {
+                return false
+            }
         }
         
         if getGryscopeSwitch.on {
-            self.deviceMotionTestCase.startGyroscopeUpdate()
+            if !self.deviceMotionTestCase.startGyroscopeUpdate() {
+                return false
+            }
         }
         
         if getDeviceMotionSwitch.on || getAttitudeSwitch.on {
-            self.deviceMotionTestCase.startDeviceMotionUpdate()
+            if !self.deviceMotionTestCase.startDeviceMotionUpdate() {
+                return false
+            }
         }
+        return true
     }
     
     func stopSensorsAcquisition() {
@@ -211,8 +244,7 @@ class ViewController: UIViewController
         if (sender as! UIButton).currentTitle == "Stop" {
             self.stopSensorsAcquisition()
             self.isRunning = false
-            self.spinOutlet.hidden = true
-            self.spinOutlet.stopAnimating()
+            self.hideAcqView()
             (sender as! UIButton).setTitle("Start", forState: UIControlState.Normal)
         } else {
             if getAccelerationSwitch.on == false
@@ -227,10 +259,19 @@ class ViewController: UIViewController
                 return
             }
             
+            if SIMULATOR {
+                presentAlertForSimulator()
+                return
+            }
+            
+            if !self.startSensorsAcquisition() {
+                presentAlertForNotAvaiableDeviceData()
+                stopSensorsAcquisition()
+                return
+            }
+            
             self.isRunning = true
-            self.startSensorsAcquisition()
-            self.spinOutlet.hidden = false
-            self.spinOutlet.startAnimating()
+            self.showAcqView()
             (sender as! UIButton).setTitle("Stop", forState: UIControlState.Normal)
         }
     }
@@ -243,6 +284,22 @@ class ViewController: UIViewController
     func presentAlertForNotAllowedSwitchCommand() {
         let alert = UIAlertController(title: self.title,
             message: "You need first to stop the data acquisition",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Return", style: UIAlertActionStyle.Cancel, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func presentAlertForNotAvaiableDeviceData() {
+        let alert = UIAlertController(title: self.title,
+            message: "Device data are not ready",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Return", style: UIAlertActionStyle.Cancel, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func presentAlertForSimulator() {
+        let alert = UIAlertController(title: self.title,
+            message: "IMU data are not avaiable on Simulator, try with a physical device",
             preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Return", style: UIAlertActionStyle.Cancel, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
